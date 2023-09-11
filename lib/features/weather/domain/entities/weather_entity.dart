@@ -10,8 +10,7 @@ class WeatherEntity extends Equatable {
   });
 
   final String city, weather;
-  final double temperature;
-  final int minTemp, maxTemp;
+  final double temperature, minTemp, maxTemp;
 
   @override
   List<Object?> get props => [

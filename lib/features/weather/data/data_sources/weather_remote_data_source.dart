@@ -11,23 +11,11 @@ abstract class WeatherRemoteDataSource {
   ///
   /// Throws a [ServerException] for all error codes.
   Future<WeatherModel> getLocalWeather();
-
-  /// Calls https://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={API_key} endpoint.
-  ///
-  /// Throws a [ServerException] for all error codes.
-  Future<WeatherModel> getCityWeather(String city);
 }
 
 class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
   final http.Client client;
-
   WeatherRemoteDataSourceImpl({required this.client});
-
-  @override
-  Future<WeatherModel> getCityWeather(String city) async {
-    final url = '${Constants.weatherApi}&q=$city';
-    return _getWeatherFromUrl(url);
-  }
 
   @override
   Future<WeatherModel> getLocalWeather() async {
@@ -35,10 +23,6 @@ class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
         desiredAccuracy: LocationAccuracy.high);
     final url =
         '${Constants.weatherApi}&lat=${position.latitude}&lon=${position.longitude}';
-    return await _getWeatherFromUrl(url);
-  }
-
-  Future<WeatherModel> _getWeatherFromUrl(String url) async {
     final response = await client.get(
       Uri.parse(url),
     );

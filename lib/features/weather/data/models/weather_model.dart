@@ -15,7 +15,7 @@ class WeatherModel extends WeatherEntity {
       weather: json['weather'][0]['main'],
       temperature: json['main']['temp'],
       minTemp: json['main']['temp_min'],
-      maxTemp: json['main']['temp_min'],
+      maxTemp: json['main']['temp_max'],
     );
   }
 
