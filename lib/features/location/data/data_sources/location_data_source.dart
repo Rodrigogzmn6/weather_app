@@ -6,28 +6,19 @@ abstract class LocationDataSource {
 }
 
 class LocationDataSourceImpl implements LocationDataSource {
-  final bool isServiceEnabled, isPermissionGranted;
-
-  const LocationDataSourceImpl({
-    required this.isServiceEnabled,
-    required this.isPermissionGranted,
-  });
+  const LocationDataSourceImpl();
 
   @override
   Future<LocationModel> getLocation() async {
-    if (isServiceEnabled) {
-      if (isPermissionGranted) {
-        final location = await Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.high);
-        return LocationModel(
-          latitude: location.latitude,
-          longitude: location.longitude,
-        );
-      } else {
-        throw ('Location permissions are not granted');
-      }
-    } else {
-      throw ('Location service is not enabled');
+    try {
+      final location = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      return LocationModel(
+        latitude: location.latitude,
+        longitude: location.longitude,
+      );
+    } catch (e) {
+      throw ('Something went wrong getting your position.\nPlease try again.');
     }
   }
 }

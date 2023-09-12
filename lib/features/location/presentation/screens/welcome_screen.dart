@@ -1,9 +1,11 @@
+// ignore_for_file: unused_result
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:weather_app/core/constants/constants.dart';
-import 'package:weather_app/features/location/presentation/provider/permission_provider.dart';
-import 'package:weather_app/features/location/presentation/provider/service_provider.dart';
-import 'package:weather_app/features/location/presentation/widgets/welcome_widget.dart';
+import 'package:weather_app/core/error/show_snackbar.dart';
+import 'package:weather_app/core/widgets/widgets.dart';
+import 'package:weather_app/features/location/presentation/provider/providers.dart';
 import 'package:weather_app/features/weather/presentation/screens/home_screen.dart';
 
 class WelcomeScreen extends ConsumerStatefulWidget {
@@ -14,43 +16,38 @@ class WelcomeScreen extends ConsumerStatefulWidget {
 }
 
 class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
-  _showSnackBar(message) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('$message'),
-        ),
-      );
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final service = ref.watch(serviceProvider);
     final permission = ref.watch(permissionProvider);
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: Constants.kBackgroundColor,
         body: service.when(
-          loading: () => const CircularProgressIndicator(),
+          loading: () => const LoadingWidget(),
           error: (error, stack) {
-            _showSnackBar(error);
+            showSnackBar(context, error);
             return WelcomeWidget(
-                handleOnPressed: () => ref.refresh(serviceProvider.future));
+                handleOnPressed: () => ref.refresh(serviceProvider.future),
+                buttonText: 'Let\'s Go!');
           },
-          data: (data) {
+          data: (serviceData) {
             return permission.when(
-              loading: () => const CircularProgressIndicator(),
+              loading: () => const LoadingWidget(),
               error: (error, stack) {
-                _showSnackBar(error);
+                showSnackBar(context, error);
                 return WelcomeWidget(
                   handleOnPressed: () {
                     ref.refresh(serviceProvider.future);
                     ref.refresh(permissionProvider.future);
                   },
+                  buttonText: 'Let\'s Go!',
                 );
               },
-              data: (data) => const HomeScreen(),
+              data: (permissionData) {
+                return const HomeScreen();
+              },
             );
           },
         ),

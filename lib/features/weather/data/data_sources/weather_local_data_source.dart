@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/core/constants/constants.dart';
-import 'package:weather_app/core/error/exception.dart';
 import 'package:weather_app/features/weather/data/models/weather_model.dart';
 
 abstract class WeatherLocalDataSource {
@@ -26,7 +25,7 @@ class WeatherLocalDataSourceImpl implements WeatherLocalDataSource {
     final jsonString = sharedPreferences.getString(Constants.cachedWeather);
     return jsonString != null
         ? Future.value(WeatherModel.fromJson(jsonDecode(jsonString)))
-        : throw CacheException();
+        : throw ('Exception');
   }
 
   @override

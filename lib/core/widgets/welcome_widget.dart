@@ -4,7 +4,9 @@ import 'package:weather_app/core/constants/constants.dart';
 
 class WelcomeWidget extends StatelessWidget {
   final Function handleOnPressed;
-  const WelcomeWidget({super.key, required this.handleOnPressed});
+  final String buttonText;
+  const WelcomeWidget(
+      {super.key, required this.handleOnPressed, required this.buttonText});
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +25,10 @@ class WelcomeWidget extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () => handleOnPressed(),
-            style: const ButtonStyle(),
-            child: const Text('Let\'s Go!'),
+            style: const ButtonStyle(
+                backgroundColor:
+                    MaterialStatePropertyAll(Constants.kTextColor)),
+            child: Text(buttonText),
           ),
         ],
       ),
