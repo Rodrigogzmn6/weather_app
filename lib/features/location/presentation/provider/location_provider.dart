@@ -21,5 +21,5 @@ final getLocationProvider = Provider<GetLocationUseCase>((ref) {
 
 final locationProvider = FutureProvider<LocationEntity>((ref) {
   final getCall = ref.read(getLocationProvider);
-  return getCall.call(NoParams());
+  return getCall(NoParams());
 });

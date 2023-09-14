@@ -2,15 +2,15 @@ import 'package:weather_app/features/weather/data/data_sources/weather_remote_da
 import 'package:weather_app/features/weather/domain/entities/weather_entity.dart';
 import 'package:weather_app/features/weather/domain/repositories/weather_repository.dart';
 
-class WeatherRepositoryImpls implements WeatherRepository {
-  final WeatherRemoteDataSourceImpl remoteDataSource;
+class WeatherRepositoryImpl implements WeatherRepository {
+  final WeatherRemoteDataSourceImpl weatherRemoteDataSource;
 
-  WeatherRepositoryImpls({required this.remoteDataSource});
+  WeatherRepositoryImpl({required this.weatherRemoteDataSource});
 
   @override
   Future<WeatherEntity> getLocalWeather(
       {required double latitude, required double longitude}) async {
-    final weatherData = await remoteDataSource.getLocalWeather(
+    final weatherData = await weatherRemoteDataSource.getLocalWeather(
         latitude: latitude, longitude: longitude);
     return weatherData;
   }

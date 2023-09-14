@@ -31,7 +31,7 @@ class WeatherWidget extends StatelessWidget {
           ),
         ),
         Text(
-          '${weather.minTemp.toInt().toString()}°/${weather.maxTemp.toInt().toString()}°',
+          '${weather.minTemp.toInt().toString()}° / ${weather.maxTemp.toInt().toString()}°',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 16.0,
