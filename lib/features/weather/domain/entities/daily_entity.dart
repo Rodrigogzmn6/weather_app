@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 class DailyEntity extends Equatable {
   final String date, imageUrl;
-  final double minTemp, maxTemp;
+  final int minTemp, maxTemp;
 
   const DailyEntity(
       {required this.date,

@@ -58,8 +58,8 @@ class ForecastRemoteDataSourceImpl implements ForecastRemoteDataSource {
       Map<String, dynamic> day = {
         'dt_txt': _getWeekDay(nextDay[0]['dt_txt']),
         'main': {
-          'temp_min': minTemp,
-          'temp_max': maxTemp,
+          'temp_min': minTemp.toInt(),
+          'temp_max': maxTemp.toInt(),
         },
         'weather': [
           {
