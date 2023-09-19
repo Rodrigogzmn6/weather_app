@@ -3,11 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:weather_app/core/error/show_snackbar.dart';
+import 'package:weather_app/core/widgets/error_widget.dart';
 import 'package:weather_app/core/widgets/widgets.dart';
 import 'package:weather_app/features/location/presentation/provider/providers.dart';
 import 'package:weather_app/features/weather/presentation/providers/forecast_provider.dart';
 import 'package:weather_app/features/weather/presentation/providers/weather_provider.dart';
-import 'package:weather_app/features/weather/presentation/widgets/test_widget.dart';
 import 'package:weather_app/features/weather/presentation/widgets/widgets.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -20,9 +20,8 @@ class HomeScreen extends ConsumerWidget {
     return location.when(
       error: (error, stack) {
         showSnackBar(context, error);
-        return WelcomeWidget(
+        return ErrorMessageWidget(
           handleOnPressed: () => ref.refresh(locationProvider.future),
-          buttonText: 'Try Again.',
         );
       },
       loading: () => const LoadingWidget(),
@@ -62,16 +61,14 @@ class HomeScreen extends ConsumerWidget {
               ),
               Expanded(
                 child: Column(
-                  // crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     weather.when(
                       error: (error, stack) {
                         showSnackBar(context, error);
-                        return WelcomeWidget(
+                        return ErrorMessageWidget(
                           handleOnPressed: () => ref.refresh(
                               localWeatherProvider(locationData).future),
-                          buttonText: 'Try Again.',
                         );
                       },
                       loading: () => const LoadingWidget(),
@@ -84,10 +81,9 @@ class HomeScreen extends ConsumerWidget {
                     forecast.when(
                       error: (error, stack) {
                         showSnackBar(context, error);
-                        return WelcomeWidget(
+                        return ErrorMessageWidget(
                           handleOnPressed: () => ref.refresh(
                               localWeatherProvider(locationData).future),
-                          buttonText: 'Try Again.',
                         );
                       },
                       loading: () => const LoadingWidget(),
@@ -100,10 +96,7 @@ class HomeScreen extends ConsumerWidget {
                             const SizedBox(
                               height: 50.0,
                             ),
-                            // GraphicForecastWidget(
-                            //   hourlyForecast: forecastData.hourlyForecast,
-                            // ),
-                            WeatherChart(
+                            GraphicForecastWidget(
                               hourlyData: forecastData.hourlyForecast,
                             ),
                           ],
