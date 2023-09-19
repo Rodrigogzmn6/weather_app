@@ -18,19 +18,5 @@ class DailyForecastWidget extends StatelessWidget {
         ),
       ),
     );
-
-    // return ListView.builder(
-    //   itemBuilder: (context, index) {
-    //     return DayForecastWidget(day: dailyForecast[index]);
-    //   },
-    //   itemCount: dailyForecast.length,
-    //   scrollDirection: Axis.horizontal,
-    // );
-
-    // return GridView.count(
-    //   crossAxisCount: dailyForecast.length,
-    //   children:
-    //       dailyForecast.map((day) => DayForecastWidget(day: day)).toList(),
-    // );
   }
 }

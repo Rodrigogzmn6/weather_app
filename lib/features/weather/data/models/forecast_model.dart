@@ -17,8 +17,8 @@ class ForecastModel extends ForecastEntity {
       dailyForecastList.add(DailyEntity(
         date: element['dt_txt'],
         imageUrl: element['weather'][0]['icon'],
-        minTemp: element['main']['temp_min'],
-        maxTemp: element['main']['temp_max'],
+        minTemp: element['main']['temp_min'].round(),
+        maxTemp: element['main']['temp_max'].round(),
       ));
     }
     for (var element in hourlyForecast) {

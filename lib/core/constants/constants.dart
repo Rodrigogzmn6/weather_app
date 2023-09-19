@@ -12,8 +12,8 @@ class Constants {
   // * Colors
   static const kBackgroundColor = Color(0xFF4D4F5E);
   static const kTextColor = Color(0xFFD98A67);
-  static const kMaxHotTemp = Color(0xFFD66C62);
-  static const kMinHotTemp = Color(0xFFF3B546);
+  static const kMaxHotTemp = Color(0x88D66C62);
+  static const kMinHotTemp = Color(0x88F3B546);
   static const kMaxColdTemp = Color(0xFF5AA3E7);
   static const kMinColdTemp = Color(0xFF2CCCF8);
 

@@ -48,18 +48,18 @@ class ForecastRemoteDataSourceImpl implements ForecastRemoteDataSource {
 
       for (var element in nextDay) {
         if (element['main']['temp_min'] < minTemp) {
-          minTemp = element['main']['temp_min'];
+          minTemp = element['main']['temp_min'].toDouble();
         }
         if (element['main']['temp_max'] > maxTemp) {
-          maxTemp = element['main']['temp_max'];
+          maxTemp = element['main']['temp_max'].toDouble();
         }
       }
 
       Map<String, dynamic> day = {
         'dt_txt': _getWeekDay(nextDay[0]['dt_txt']),
         'main': {
-          'temp_min': minTemp.toInt(),
-          'temp_max': maxTemp.toInt(),
+          'temp_min': minTemp.round(),
+          'temp_max': maxTemp.round(),
         },
         'weather': [
           {
