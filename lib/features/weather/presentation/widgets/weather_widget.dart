@@ -16,26 +16,37 @@ class WeatherWidget extends StatelessWidget {
             fontSize: 20.0,
           ),
         ),
-        Text(
-          weather.weather,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16.0,
-          ),
-        ),
-        Text(
-          '${weather.temperature.toInt().toString()}°',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 80.0,
-          ),
-        ),
-        Text(
-          '${weather.minTemp.toInt().toString()}° / ${weather.maxTemp.toInt().toString()}°',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16.0,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Column(
+              children: [
+                Text(
+                  '${weather.temperature.toInt().toString()}°',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 80.0,
+                  ),
+                ),
+                Text(
+                  '${weather.minTemp.toInt().toString()}° / ${weather.maxTemp.toInt().toString()}°',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16.0,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              width: 50.0,
+            ),
+            Expanded(
+              child: Image.asset(
+                'assets/images/${weather.weather}.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ],
         ),
       ],
     );

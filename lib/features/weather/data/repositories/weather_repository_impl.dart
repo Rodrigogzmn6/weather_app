@@ -14,4 +14,11 @@ class WeatherRepositoryImpl implements WeatherRepository {
         latitude: latitude, longitude: longitude);
     return weatherData;
   }
+
+  @override
+  Future<WeatherEntity> getCityWeather({required String city}) async {
+    final weatherData =
+        await weatherRemoteDataSource.getCityWeather(city: city);
+    return weatherData;
+  }
 }

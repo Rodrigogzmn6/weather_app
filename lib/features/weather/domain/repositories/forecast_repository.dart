@@ -3,4 +3,6 @@ import 'package:weather_app/features/weather/domain/entities/forecast_entity.dar
 abstract class ForecastRepository {
   Future<ForecastEntity> getLocalForecast(
       {required double latitude, required double longitude});
+
+  Future<ForecastEntity> getCityForecast({required String city});
 }

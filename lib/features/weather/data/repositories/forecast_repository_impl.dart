@@ -16,4 +16,12 @@ class ForecastRepositoryImpl implements ForecastRepository {
     );
     return forecastData;
   }
+
+  @override
+  Future<ForecastEntity> getCityForecast({required String city}) async {
+    final forecastData = await forecastRemoteDataSource.getCityForecast(
+      city: city,
+    );
+    return forecastData;
+  }
 }

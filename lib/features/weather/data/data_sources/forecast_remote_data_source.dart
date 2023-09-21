@@ -8,6 +8,10 @@ abstract class ForecastRemoteDataSource {
     required double latitude,
     required double longitude,
   });
+
+  Future<ForecastModel> getCityForecast({
+    required String city,
+  });
 }
 
 class ForecastRemoteDataSourceImpl implements ForecastRemoteDataSource {
@@ -31,6 +35,26 @@ class ForecastRemoteDataSourceImpl implements ForecastRemoteDataSource {
         throw ('Something went wrong connecting to the API.\nPlease try again');
       }
     } catch (e) {
+      throw ('Timeout error.\nPlease try again.');
+    }
+  }
+
+  @override
+  Future<ForecastModel> getCityForecast({required String city}) async {
+    final url = '${Constants.forecastApi}&q=$city';
+    try {
+      final response =
+          await client.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200) {
+        return ForecastModel.fromList(
+          _getDailyForecast(jsonDecode(response.body)['list']),
+          _getHourlyForecast(jsonDecode(response.body)['list']),
+        );
+      } else {
+        throw ('Something went wrong connecting to the API.\nPlease try again');
+      }
+    } catch (e) {
+      print(e);
       throw ('Timeout error.\nPlease try again.');
     }
   }

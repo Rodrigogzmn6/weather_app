@@ -9,6 +9,8 @@ abstract class WeatherRemoteDataSource {
   /// Throws a [ServerException] for all error codes.
   Future<WeatherModel> getLocalWeather(
       {required double latitude, required double longitude});
+
+  Future<WeatherModel> getCityWeather({required String city});
 }
 
 class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
@@ -29,6 +31,25 @@ class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
           ? WeatherModel.fromJson(jsonDecode(response.body))
           : throw ('Something went wrong connecting to the API.\nPlease try again');
     } catch (e) {
+      throw ('Timeout error.\nPlease try again.');
+    }
+  }
+
+  @override
+  Future<WeatherModel> getCityWeather({required String city}) async {
+    final url = '${Constants.weatherApi}&q=$city';
+    try {
+      final response = await client
+          .get(
+            Uri.parse(url),
+          )
+          .timeout(const Duration(seconds: 10));
+      print(response.statusCode);
+      return response.statusCode == 200
+          ? WeatherModel.fromJson(jsonDecode(response.body))
+          : throw ('Something went wrong connecting to the API.\nPlease try again');
+    } catch (e) {
+      print(e);
       throw ('Timeout error.\nPlease try again.');
     }
   }

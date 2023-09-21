@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:weather_app/core/constants/constants.dart';
 import 'package:weather_app/core/error/show_snackbar.dart';
-import 'package:weather_app/core/widgets/error_widget.dart';
 import 'package:weather_app/core/widgets/widgets.dart';
 import 'package:weather_app/features/location/presentation/provider/providers.dart';
 import 'package:weather_app/features/weather/presentation/screens/home_screen.dart';
@@ -47,9 +46,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                   },
                 );
               },
-              data: (permissionData) {
-                return const HomeScreen();
-              },
+              data: (permissionData) => const HomeScreen(),
             );
           },
         ),

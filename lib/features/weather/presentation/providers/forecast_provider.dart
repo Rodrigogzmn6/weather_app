@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:weather_app/core/providers/providers.dart';
+import 'package:weather_app/core/usecases/city_params.dart';
 import 'package:weather_app/core/usecases/location_params.dart';
 import 'package:weather_app/features/location/domain/entities/location_entity.dart';
 import 'package:weather_app/features/weather/data/data_sources/forecast_remote_data_source.dart';
 import 'package:weather_app/features/weather/data/repositories/forecast_repository_impl.dart';
 import 'package:weather_app/features/weather/domain/entities/forecast_entity.dart';
+import 'package:weather_app/features/weather/domain/use_cases/get_city_forecast.dart';
 import 'package:weather_app/features/weather/domain/use_cases/get_local_forecast.dart';
 
 final forecastRemoteDataSourceProvider =
@@ -28,5 +30,18 @@ final localForecastProvider =
   return getCall(LocationParams(
     latitude: location.latitude,
     longitude: location.longitude,
+  ));
+});
+
+final getCityForecastProvider = Provider<GetCityForecast>((ref) {
+  final repository = ref.read(forecastRepositoryProvider);
+  return GetCityForecast(repository: repository);
+});
+
+final cityForecastProvider =
+    FutureProvider.family<ForecastEntity, String>((ref, city) {
+  final getCall = ref.read(getCityForecastProvider);
+  return getCall(CityParams(
+    cityName: city,
   ));
 });
