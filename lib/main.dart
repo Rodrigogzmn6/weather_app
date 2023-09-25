@@ -4,7 +4,6 @@ import 'package:weather_app/app.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
   runApp(
     const ProviderScope(
       child: WeatherApp(),

@@ -24,8 +24,8 @@ class ForecastModel extends ForecastEntity {
     for (var element in hourlyForecast) {
       hourlyForecastList.add(HourlyEntity(
         date: element['dt_txt'],
-        minTemp: element['main']['temp_min'],
-        maxTemp: element['main']['temp_max'],
+        minTemp: element['main']['temp_min'].toDouble(),
+        maxTemp: element['main']['temp_max'].toDouble(),
       ));
     }
     return ForecastModel(

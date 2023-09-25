@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/core/constants/constants.dart';
 import 'package:weather_app/features/weather/domain/entities/weather_entity.dart';
 
 class WeatherWidget extends StatelessWidget {
@@ -42,8 +43,11 @@ class WeatherWidget extends StatelessWidget {
             ),
             Expanded(
               child: Image.asset(
-                'assets/images/${weather.weather}.png',
+                Constants.unsoportedWeatherConditions.contains(weather.weather)
+                    ? 'assets/images/Atmosphere.png'
+                    : 'assets/images/${weather.weather}.png',
                 fit: BoxFit.cover,
+                // height: 50.0,
               ),
             ),
           ],

@@ -13,7 +13,9 @@ class WeatherApp extends ConsumerWidget {
       theme: ThemeData(
         textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
       ),
-      home: const WelcomeScreen(),
+      home: const SafeArea(
+        child: WelcomeScreen(),
+      ),
     );
   }
 }

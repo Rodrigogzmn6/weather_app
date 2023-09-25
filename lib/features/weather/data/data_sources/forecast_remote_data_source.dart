@@ -54,7 +54,6 @@ class ForecastRemoteDataSourceImpl implements ForecastRemoteDataSource {
         throw ('Something went wrong connecting to the API.\nPlease try again');
       }
     } catch (e) {
-      print(e);
       throw ('Timeout error.\nPlease try again.');
     }
   }
@@ -82,8 +81,8 @@ class ForecastRemoteDataSourceImpl implements ForecastRemoteDataSource {
       Map<String, dynamic> day = {
         'dt_txt': _getWeekDay(nextDay[0]['dt_txt']),
         'main': {
-          'temp_min': minTemp.round(),
-          'temp_max': maxTemp.round(),
+          'temp_min': minTemp.toDouble().round(),
+          'temp_max': maxTemp.toDouble().round(),
         },
         'weather': [
           {

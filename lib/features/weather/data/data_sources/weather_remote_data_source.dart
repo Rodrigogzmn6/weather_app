@@ -44,12 +44,10 @@ class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
             Uri.parse(url),
           )
           .timeout(const Duration(seconds: 10));
-      print(response.statusCode);
       return response.statusCode == 200
           ? WeatherModel.fromJson(jsonDecode(response.body))
           : throw ('Something went wrong connecting to the API.\nPlease try again');
     } catch (e) {
-      print(e);
       throw ('Timeout error.\nPlease try again.');
     }
   }

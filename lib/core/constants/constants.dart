@@ -10,6 +10,7 @@ class Constants {
   static const String iconApi = 'https://openweathermap.org/img/wn/';
 
   // * Colors
+  static const kAppBarBackgroundColor = Color(0xFF1B2430);
   static const kBackgroundColor = Color(0xFF4D4F5E);
   static const kTextColor = Color(0xFFD98A67);
   static const kMaxHotTemp = Color(0x88D66C62);
@@ -19,6 +20,22 @@ class Constants {
 
   // * Shared Preferences
   static const String cachedWeather = 'CACHED_WEATHER';
+
+  // * Strings
+  static const String loadingText = 'Please wait...';
+
+  // *Unsoported Weather Conditions
+  static const List<String> unsoportedWeatherConditions = [
+    'Mist',
+    'Smoke',
+    'Haze',
+    'Dust',
+    'Fog',
+    'Sand',
+    'Ash',
+    'Squall',
+    'Tornado'
+  ];
 
   // * Week Days
   static const List<String> weekDays = [

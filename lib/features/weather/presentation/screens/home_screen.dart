@@ -2,192 +2,168 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:weather_app/core/error/show_snackbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/core/providers/shared_preferences_provider.dart';
 import 'package:weather_app/core/widgets/widgets.dart';
 import 'package:weather_app/features/location/presentation/provider/providers.dart';
 import 'package:weather_app/features/weather/presentation/providers/forecast_provider.dart';
 import 'package:weather_app/features/weather/presentation/providers/weather_provider.dart';
-import 'package:weather_app/features/weather/presentation/widgets/widgets.dart';
+import 'package:weather_app/features/weather/presentation/widgets/weather_page_widget.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final location = ref.watch(locationProvider);
     final sharedPreferences = ref.watch(sharedPreferencesProvider);
+    final location = ref.watch(locationProvider);
     String newCity = '';
 
-    return sharedPreferences.when(
-      error: (error, stack) {
-        showSnackBar(context, error);
-        return ErrorMessageWidget(
-          handleOnPressed: () => ref.refresh(locationProvider.future),
-        );
-      },
-      loading: () => const Center(child: LoadingWidget()),
-      data: (sharedPreferencesData) => location.when(
-        error: (error, stack) {
-          showSnackBar(context, error);
-          return ErrorMessageWidget(
-            handleOnPressed: () => ref.refresh(locationProvider.future),
+    void refreshServices() {
+      ref.refresh(sharedPreferencesProvider);
+      ref.refresh(locationProvider);
+    }
+
+    void addCity(SharedPreferences sharedPreferences) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Add a new city.'),
+            content: TextField(
+              onChanged: (value) => newCity = value,
+              decoration: const InputDecoration(labelText: 'Name'),
+            ),
+            actions: [
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('Add'),
+                onPressed: () async {
+                  final citiesList =
+                      sharedPreferences.getStringList('cities') ?? [];
+                  await sharedPreferences
+                      .setStringList('cities', [...citiesList, newCity]);
+                  refreshServices();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
           );
         },
-        loading: () => const Center(child: LoadingWidget()),
-        data: (locationData) {
-          final weather = ref.watch(localWeatherProvider(locationData));
-          final forecast = ref.watch(localForecastProvider(locationData));
+      );
+    }
 
-          final List<String> lookedCities =
-              sharedPreferencesData.getStringList('cities') ?? [];
-          final List<Widget> citiesWeather = lookedCities.map((city) {
-            final cityWeather = ref.watch(cityWeatherProvider(city));
-            final cityForecast = ref.watch(cityForecastProvider(city));
-            return cityWeather.when(
-              error: (error, stack) {
-                showSnackBar(context, error);
-                return ErrorMessageWidget(
-                  handleOnPressed: () =>
-                      ref.refresh(localWeatherProvider(locationData).future),
-                );
-              },
-              loading: () => const Center(child: LoadingWidget()),
-              data: (weatherData) => cityForecast.when(
-                  error: (error, stack) {
-                    showSnackBar(context, error);
-                    return ErrorMessageWidget(
-                      handleOnPressed: () => ref
-                          .refresh(localWeatherProvider(locationData).future),
-                    );
-                  },
-                  loading: () => const Center(child: LoadingWidget()),
-                  data: (forecastData) => Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          WeatherWidget(weather: weatherData),
-                          DailyForecastWidget(
-                              dailyForecast: forecastData.dailyForecast),
-                          GraphicForecastWidget(
-                            hourlyData: forecastData.hourlyForecast,
-                          ),
-                        ],
-                      )),
+    void deleteCity(SharedPreferences sharedPreferences, int index) async {
+      final citiesList = sharedPreferences.getStringList('cities') ?? [];
+      citiesList.removeAt(index);
+      await sharedPreferences.setStringList('cities', citiesList);
+      refreshServices();
+    }
+
+    List<Widget> getCitiesPages(SharedPreferences sharedPreferencesData) {
+      // Get the saved cities from the Local Storage
+      final List<String> lookedCities =
+          sharedPreferencesData.getStringList('cities') ?? [];
+
+      // Create a List of Widgets, containing weather and forecast data for each city
+      final List<Widget> citiesWeather = lookedCities.map((city) {
+        final cityWeather = ref.watch(cityWeatherProvider(city));
+        final cityForecast = ref.watch(cityForecastProvider(city));
+
+        void checkCityData() {
+          ref.refresh(cityWeatherProvider(city));
+          ref.refresh(cityForecastProvider(city));
+        }
+
+        // * City Weather
+        return cityWeather.when(
+          error: (error, stack) {
+            return ErrorMessageWidget(
+              message: error.toString(),
+              handleOnPressed: checkCityData,
+              handleAction: () =>
+                  deleteCity(sharedPreferencesData, lookedCities.indexOf(city)),
             );
-          }).toList();
+          },
+          loading: () => const LoadingWidget(),
 
-          return Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 30.0,
-              horizontal: 25.0,
+          // * City Forecast
+          data: (weatherData) => cityForecast.when(
+            error: (error, stack) {
+              return ErrorMessageWidget(
+                message: error.toString(),
+                handleOnPressed: checkCityData,
+                handleAction: () => deleteCity(
+                    sharedPreferencesData, lookedCities.indexOf(city)),
+              );
+            },
+            loading: () => const Center(child: LoadingWidget()),
+            data: (forecastData) => WeatherPageWidget(
+              weatherData: weatherData,
+              forecastData: forecastData,
+              isDeletable: true,
+              handleOnAction: () =>
+                  deleteCity(sharedPreferencesData, lookedCities.indexOf(city)),
+              handleOnReload: refreshServices,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+          ),
+        );
+      }).toList();
+
+      return citiesWeather;
+    }
+
+    return sharedPreferences.when(
+      loading: () => const LoadingWidget(),
+      error: (error, stack) => ErrorMessageWidget(
+        message: error.toString(),
+        handleOnPressed: refreshServices,
+      ),
+      data: (sharedPreferencesData) {
+        final List<Widget> citiesWeather =
+            getCitiesPages(sharedPreferencesData);
+        return location.when(
+          loading: () => const LoadingWidget(),
+          error: (error, stack) => ErrorMessageWidget(
+            message: error.toString(),
+            handleOnPressed: refreshServices,
+          ),
+          data: (locationData) {
+            final weather = ref.watch(localWeatherProvider(locationData));
+            final forecast = ref.watch(localForecastProvider(locationData));
+            return PageView(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed: () async {
-                        await sharedPreferencesData.setStringList('cities', []);
-                        ref.refresh(locationProvider.future);
-                        ref.refresh(localWeatherProvider(locationData).future);
-                      },
-                      icon: const Icon(
-                        Icons.refresh_rounded,
-                        color: Colors.white,
-                      ),
+                weather.when(
+                  loading: () => const LoadingWidget(),
+                  error: (error, stack) => ErrorMessageWidget(
+                    message: error.toString(),
+                    handleOnPressed: refreshServices,
+                  ),
+                  data: (weatherData) => forecast.when(
+                    loading: () => const LoadingWidget(),
+                    error: (error, stack) => ErrorMessageWidget(
+                      message: error.toString(),
+                      handleOnPressed: refreshServices,
                     ),
-                    IconButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Add a new city.'),
-                              content: TextField(
-                                onChanged: (value) => newCity = value,
-                                decoration:
-                                    const InputDecoration(labelText: 'Name'),
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('Cancel'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                TextButton(
-                                  child: const Text('Add'),
-                                  onPressed: () async {
-                                    final citiesList = sharedPreferencesData
-                                            .getStringList('cities') ??
-                                        [];
-                                    await sharedPreferencesData.setStringList(
-                                        'cities', [...citiesList, newCity]);
-                                    ref.refresh(locationProvider.future);
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      icon: const Icon(
-                        Icons.add_rounded,
-                        color: Colors.white,
-                      ),
+                    data: (forecastData) => WeatherPageWidget(
+                      weatherData: weatherData,
+                      forecastData: forecastData,
+                      handleOnAction: () => addCity(sharedPreferencesData),
+                      handleOnReload: refreshServices,
                     ),
-                  ],
-                ),
-                Expanded(
-                  child: PageView(
-                    children: [
-                      weather.when(
-                        error: (error, stack) {
-                          showSnackBar(context, error);
-                          return ErrorMessageWidget(
-                            handleOnPressed: () => ref.refresh(
-                                localWeatherProvider(locationData).future),
-                          );
-                        },
-                        loading: () => const Center(child: LoadingWidget()),
-                        data: (weatherData) => forecast.when(
-                          error: (error, stack) {
-                            showSnackBar(context, error);
-                            return ErrorMessageWidget(
-                              handleOnPressed: () => ref.refresh(
-                                  localWeatherProvider(locationData).future),
-                            );
-                          },
-                          loading: () => const Center(child: LoadingWidget()),
-                          data: (forecastData) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                WeatherWidget(weather: weatherData),
-                                DailyForecastWidget(
-                                    dailyForecast: forecastData.dailyForecast),
-                                GraphicForecastWidget(
-                                  hourlyData: forecastData.hourlyForecast,
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                      ...citiesWeather
-                    ],
                   ),
                 ),
+                ...citiesWeather,
               ],
-            ),
-          );
-        },
-      ),
+            );
+          },
+        );
+      },
     );
   }
 }

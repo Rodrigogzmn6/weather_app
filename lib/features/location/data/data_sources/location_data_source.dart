@@ -18,7 +18,7 @@ class LocationDataSourceImpl implements LocationDataSource {
         longitude: location.longitude,
       );
     } catch (e) {
-      throw ('Something went wrong getting your position.\nPlease try again.');
+      throw ('Something went wrong getting your position');
     }
   }
 }
